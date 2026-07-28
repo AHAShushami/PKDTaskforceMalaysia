@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PKD Function Review — Participant Feedback Dashboard | KKM</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="participant_styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Top Corporate KKM Light Header -->
+        <header class="top-header">
+            <div class="header-left">
+                <div class="kkm-logo-wrap">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/LOGO_KEMENTERIAN_KESIHATAN_MALAYSIA_%28BM%29.png/960px-LOGO_KEMENTERIAN_KESIHATAN_MALAYSIA_%28BM%29.png" alt="KKM Logo" class="kkm-logo">
+                </div>
+                <div class="header-titles">
+                    <h1>PKD Function Review — Participant Feedback Dashboard</h1>
+                    <p>Taskforce Rebranding PKD Malaysia • Kementerian Kesihatan Malaysia</p>
+                </div>
+            </div>
+            <div class="header-sync">
+                <div class="sync-indicator">
+                    <span class="pulse-dot"></span>
+                    <span id="syncText">Live Sheet Connected</span>
+                </div>
+                <button id="btnRefresh" class="btn-refresh">🔄 Refresh Live CSV</button>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <!-- Hero Thank-You & Stat Banner -->
+            <section class="hero-banner">
+                <div class="hero-content">
+                    <span class="hero-badge">PARTICIPANT ACKNOWLEDGEMENT & FINDINGS REPORT</span>
+                    <h2>Thank You to Our Participating District Health Offices!</h2>
+                    <p>Recognizing ground operational accomplishments, celebrating alignment with WHO's 12 Essential Public Health Functions, and highlighting key reform priorities.</p>
+                </div>
+                <div class="hero-metrics">
+                    <div class="m-card">
+                        <span class="m-val" id="metricSampleCount">N = 36</span>
+                        <span class="m-lbl">PKDs Responded</span>
+                    </div>
+                    <div class="m-card">
+                        <span class="m-val" id="metricStateCount">14</span>
+                        <span class="m-lbl">States & FT Reached</span>
+                    </div>
+                    <div class="m-card">
+                        <span class="m-val" id="metricMentions">280+</span>
+                        <span class="m-lbl">Qualitative Code Volume</span>
+                    </div>
+                    <div class="m-card" style="border-color: var(--kkm-gold);">
+                        <span class="m-val" style="color: var(--kkm-gold);">100%</span>
+                        <span class="m-lbl">WHO EPHF Alignment</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Navigation Tabs -->
+            <nav class="p-nav">
+                <button class="p-nav-item active" data-tab="scorecard">
+                    <span class="icon">🕸️</span> EPHF Ground Accomplishments
+                </button>
+                <button class="p-nav-item" data-tab="top-reforms">
+                    <span class="icon">🚨</span> Top 2 Reform Priorities
+                </button>
+                <button class="p-nav-item" data-tab="framework">
+                    <span class="icon">⚖️</span> Structural Issues vs Assets
+                </button>
+            </nav>
+
+            <!-- TAB 1: EPHF GROUND ACCOMPLISHMENTS SCORECARD -->
+            <section id="tab-scorecard" class="p-tab-content active">
+                <div class="p-card">
+                    <div class="p-card-header">
+                        <h3>🕸️ WHO 12 EPHF Ground Operational Accomplishments Scorecard</h3>
+                        <span class="tag-badge">What PKDs Have Actually Done in Daily Operations</span>
+                    </div>
+                    <p class="p-card-sub">
+                        100% of participating District Health Offices demonstrated extraordinary ground operational achievements across WHO's 12 Essential Public Health Functions (EPHF 2024), leading primary care, vector control, and disaster management despite staffing and space constraints. All verbatim quotes are anonymized (citing State & Years of Service).
+                    </p>
+
+                    <!-- EPHF Cards Grid -->
+                    <div class="ephf-grid" id="ephfScorecardGrid">
+                        <!-- Populated dynamically by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: TOP 2 CRITICAL STRUCTURAL REFORM PRIORITIES -->
+            <section id="tab-top-reforms" class="p-tab-content">
+                <div class="top-reforms-banner">
+                    <h3>🚨 Top 2 Critical Structural Issues Requiring Ministerial Reform</h3>
+                    <p>Unanimously identified by ground Public Health Medicine Specialists & DHO leadership as the most urgent structural bottlenecks.</p>
+                </div>
+
+                <div class="reform-highlight-grid">
+                    <!-- #1 PRIORITY CARD -->
+                    <div class="reform-card priority-1">
+                        <div class="reform-badge-top">#1 TOP PRIORITY REFORM</div>
+                        <h4>THREAT-MOH — Top-Down Ministerial Policy & Implementation Disconnect</h4>
+                        <div class="reform-count-tag">Mentioned by N = 30 / 36 PKDs (83% of Respondents)</div>
+                        <div class="quote-callout">
+                            <p>"Ketidakselarian antara perancang di peringkat kementerian dengan realiti operasi di lapangan, di mana program baharu sering diperkenalkan tanpa mengambil kira kekangan perjawatan dan beban kerja semasa di daerah."</p>
+                            <span class="quote-source">— Sarawak (17 years of service)</span>
+                        </div>
+                        <div class="action-box">
+                            <strong>🔧 Ministerial Reform Action:</strong> Mandate ground feasibility impact assessments and district co-design prior to any central policy rollout!
+                        </div>
+                    </div>
+
+                    <!-- #2 PRIORITY CARD -->
+                    <div class="reform-card priority-2">
+                        <div class="reform-badge-top" style="background: var(--kkm-gold); color: #ffffff;">#2 SECOND PRIORITY REFORM</div>
+                        <h4>WEAK-HR-TASK — Multi-Tasking & Concurrent Event Overload</h4>
+                        <div class="reform-count-tag" style="background: var(--kkm-gold-light); color: var(--kkm-gold);">Mentioned by N = 32 / 36 PKDs (89% of Respondents)</div>
+                        <div class="quote-callout">
+                            <p>"Petugas perlu menjalankan tugas rutin di klinik serta tugasan kawalan wabak dan bencana serentak, menyebabkan kelesuan anggota dan risiko bebanan kerja lampau."</p>
+                            <span class="quote-source">— Terengganu (15 years of service)</span>
+                        </div>
+                        <div class="action-box" style="border-left-color: var(--kkm-gold);">
+                            <strong>🔧 Ministerial Reform Action:</strong> Establish dedicated rapid-response surge teams to protect routine primary care delivery!
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: STRATEGIC REFORM FRAMEWORK (ISSUES VS ASSETS) -->
+            <section id="tab-framework" class="p-tab-content">
+                <div class="framework-toggle-bar">
+                    <button class="toggle-btn active" id="btnShowIssues">🔴 Structural Issues Needing Reform</button>
+                    <button class="toggle-btn" id="btnShowAssets">🟢 Core Assets & Strengths to Protect</button>
+                </div>
+
+                <!-- Issues Container -->
+                <div id="containerIssues" class="framework-list">
+                    <!-- Populated dynamically by JS -->
+                </div>
+
+                <!-- Assets Container -->
+                <div id="containerAssets" class="framework-list" style="display: none;">
+                    <!-- Populated dynamically by JS -->
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="participant_app.js"></script>
+</body>
+</html>
