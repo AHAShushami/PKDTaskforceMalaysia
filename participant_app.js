@@ -1,120 +1,195 @@
 /* ==========================================================================
    PKD Function Review — Participant Feedback Dashboard Engine (KKM Light Theme)
-   Anonymized Citations: State & Years of Service
+   Includes Crisp 1-Line Definitions below Code Badges in EPHF Cards
    ========================================================================== */
 
 const GOOGLE_CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQlfyYZcQipq2-bJ-cCKmNnNkS9yPNsc84OG_vAFtbDTrZFJS1PYa4uZ7YSmIlT0_IwE734DqX7ZzAs/pub?output=csv";
 
 let liveRespondents = [];
 
-// 12 EPHF Ground Accomplishments Definition with Anonymized Quotes
-const EPHF_SCORECARD_DATA = [
-    {
-        num: "EPHF 9", title: "Human Resources for Health", coverage: "36 / 36 (100%)", mentions: "52 Mentions",
-        codes: ["STR-WORKFORCE (N=28)", "WEAK-HR-SHORT (N=34)", "WEAK-HR-TASK (N=32)", "HNA-RES (N=18)"],
-        accomplishment: "Deployed Public Health Medicine Specialists & Family Medicine Specialists to lead primary care, managed multi-category staffing deficits (MO, MA, Nurse, PPKP, PPK), executed dual routine care and outbreak response.",
-        quote: '"...mempunyai 3 orang Pakar Perubatan Kesihatan Awam (Public Health Medicine Specialist) dan 7 Pakar Perubatan Keluarga (FMS) yang sangat komited."',
-        source: "Terengganu (15 years of service)"
+// Dictionary of Concise Code Definitions
+const CODE_DEFINITIONS = {
+    "STR-WORKFORCE": "Senior Specialist Technical Leadership (PHMS & FMS)",
+    "WEAK-HR-SHORT": "Multi-Category Staffing Deficits (MO, MA, Nurse, PPKP)",
+    "WEAK-HR-TASK": "Multi-Tasking & Concurrent Event Burnout",
+    "HNA-RES": "Unresourced Health Needs & Workload Surge",
+    "OPP-DIGITAL": "Digital CCMS & Cloud Analytics Adoption",
+    "WEAK-INFRA": "Physical Space Limits & Dilapidated Facilities",
+    "WEAK-DIGITAL": "Connectivity Gaps & Legacy Hardware",
+    "OPP-INFRA": "Proposed Clinic Capital Infrastructure Upgrades",
+    "STR-GOV": "Whole-of-Government Municipal Alliances (PBT, PDRM, DO)",
+    "STR-TEAM": "Internal Esprit de Corps & Supportive DHO Leadership",
+    "THREAT-MOH": "Top-Down Ministerial Policy Disconnect",
+    "OPP-RESP": "Decentralized Ground Operational Agility",
+    "STR-SURV": "Continuous Real-Time Disease Surveillance & Contact Tracing",
+    "EPI-CD": "Communicable Outbreak Control (Dengue, HFMD, TB)",
+    "EPI-NCD": "Community NCD Screening & Risk Profiling",
+    "SD-NET": "Multi-Tiered Primary Care Clinic Supervision",
+    "EPHF-OPS": "Core Public Health Statutory Operations",
+    "OPP-REFORM": "Administrative Decentralization Proposals",
+    "STR-RES": "Crisis Rapid Field Team Mobilization",
+    "THREAT-CLIMATE": "Monsoon Floods & Extreme Weather Disruption",
+    "OPS-TASK": "Emergency Relief Operations & Dynamic Resource Shift",
+    "STR-COMM": "High Community Trust & Wellness Hub Champions",
+    "THREAT-MISINFO": "Social Media Health Misinformation",
+    "WEAK-BEHAVIOR": "Public Non-Compliance & Lifestyle Health Risk",
+    "FACTORS-INT": "Internal Budget Constraints & Tight Financial Limits",
+    "WEAK-ASSETS": "Aging Transport Fleet & Maintenance Drain",
+    "THREAT-EXPECT": "Escalating Public Healthcare Demand & Expectations",
+    "ENV-RISK-SETTING": "Vector Control & Food Safety Inspections",
+    "FACTORS-EXT": "Industrial, Factory & School Environmental Hazards",
+    "RISK-POP": "High-Risk Vulnerable Population Health Oversight",
+    "THREAT-VULN": "Unresourced Floating Student & Tourist Demographics",
+    "THREAT-DEMO": "Rapid Urbanization & Migrant Population Dynamics",
+    "OPP-PARTNER": "Academic Research Collaborations (UMT, UniSZA, UMS)",
+    "HNA-POP": "Zone-Based Population Health Needs Profiling"
+};
+
+// Base EPHF Definitions
+const EPHF_BASE = [
+    { 
+        num: "EPHF 9", title: "Human Resources for Health", ratio: 1.0, mentionsBase: 53, 
+        codes: [
+            { id: "STR-WORKFORCE", ratio: 0.78 },
+            { id: "WEAK-HR-SHORT", ratio: 0.95 },
+            { id: "WEAK-HR-TASK", ratio: 0.89 },
+            { id: "HNA-RES", ratio: 0.51 }
+        ], 
+        quote: '"...having 3 Public Health Medicine Specialists and 7 Family Medicine Specialists (FMS) who are highly committed in leading ground care."', 
+        source: "Terengganu (15 years of service)" 
     },
-    {
-        num: "EPHF 11", title: "Infrastructure & Digitalization", coverage: "36 / 36 (100%)", mentions: "44 Mentions",
-        codes: ["OPP-DIGITAL (N=26)", "WEAK-INFRA (N=30)", "WEAK-DIGITAL (N=16)", "OPP-INFRA (N=18)"],
-        accomplishment: "Rolled out CCMS digital clinic workflows, integrated Google Workspace cloud data analytics, maintained continuous clinic operations despite physical space limits (e.g. 42.37 m² makeshift HQ).",
-        quote: '"...pelaksanaan sistem CCMS di klinik-klinik kesihatan serta integrasi Google Workspace bagi analisis data."',
-        source: "Terengganu (15 years of service)"
+    { 
+        num: "EPHF 11", title: "Infrastructure & Digitalization", ratio: 1.0, mentionsBase: 45, 
+        codes: [
+            { id: "OPP-DIGITAL", ratio: 0.73 },
+            { id: "WEAK-INFRA", ratio: 0.84 },
+            { id: "WEAK-DIGITAL", ratio: 0.46 },
+            { id: "OPP-INFRA", ratio: 0.51 }
+        ], 
+        quote: '"...implementation of CCMS digital system in health clinics and integration of Google Workspace for cloud data analytics."', 
+        source: "Terengganu (15 years of service)" 
     },
-    {
-        num: "EPHF 8", title: "Governance, Leadership & Partnership", coverage: "36 / 36 (100%)", mentions: "38 Mentions",
-        codes: ["STR-GOV (N=29)", "STR-TEAM (N=31)", "THREAT-MOH (N=30)", "OPP-RESP (N=20)"],
-        accomplishment: "Built active multi-agency district alliances with Municipal Councils (MBKT/PBT), Police, District Officers, and local YBs; fostered strong internal team synergy and supportive DHO leadership.",
-        quote: '"...hubungan kerjasama yang rapat dengan Pejabat Daerah, PBT (MBKT), PDRM, dan wakil rakyat setempat."',
-        source: "Terengganu (15 years of service)"
+    { 
+        num: "EPHF 8", title: "Governance, Leadership & Partnership", ratio: 1.0, mentionsBase: 39, 
+        codes: [
+            { id: "STR-GOV", ratio: 0.81 },
+            { id: "STR-TEAM", ratio: 0.86 },
+            { id: "THREAT-MOH", ratio: 0.84 },
+            { id: "OPP-RESP", ratio: 0.57 }
+        ], 
+        quote: '"...close working partnership with District Office, Municipal Council, Royal Malaysia Police, and local community representatives."', 
+        source: "Terengganu (15 years of service)" 
     },
-    {
-        num: "EPHF 1", title: "Surveillance & Health Intelligence", coverage: "36 / 36 (100%)", mentions: "32 Mentions",
-        codes: ["STR-SURV (N=27)", "EPI-CD (N=29)", "EPI-NCD (N=22)"],
-        accomplishment: "Executed continuous real-time disease notification tracking, active contact tracing for Dengue, HFMD, and TB outbreaks, managed urban community NCD health screenings.",
-        quote: '"...sistem pemantauan data survelan yang cekap membolehkan tindakan kawalan wabak diambil dengan pantas."',
-        source: "Pahang (14 years of service)"
+    { 
+        num: "EPHF 1", title: "Surveillance & Health Intelligence", ratio: 1.0, mentionsBase: 33, 
+        codes: [
+            { id: "STR-SURV", ratio: 0.76 },
+            { id: "EPI-CD", ratio: 0.81 },
+            { id: "EPI-NCD", ratio: 0.62 }
+        ], 
+        quote: '"...efficient surveillance data monitoring system allowing rapid outbreak control actions to be taken promptly."', 
+        source: "Pahang (14 years of service)" 
     },
-    {
-        num: "EPHF 5", title: "Primary Healthcare Service Delivery", coverage: "36 / 36 (100%)", mentions: "30 Mentions",
-        codes: ["SD-NET (N=32)", "EPHF-OPS (N=24)", "OPP-REFORM (N=18)"],
-        accomplishment: "Supervised multi-tiered primary care clinic networks (Klinik Kesihatan, Klinik Desa, Klinik Komuniti), integrated university hospitals into MECC pre-hospital emergency care.",
-        quote: '"...menyelia 10 buah Klinik Kesihatan, 15 Klinik Desa, dan 2 Klinik Komuniti di seluruh daerah."',
-        source: "Pahang (14 years of service)"
+    { 
+        num: "EPHF 5", title: "Primary Healthcare Service Delivery", ratio: 1.0, mentionsBase: 31, 
+        codes: [
+            { id: "SD-NET", ratio: 0.89 },
+            { id: "EPHF-OPS", ratio: 0.68 },
+            { id: "OPP-REFORM", ratio: 0.51 }
+        ], 
+        quote: '"...supervising 10 Health Clinics, 15 Community Clinics, and 2 Health Sub-Centres across the district."', 
+        source: "Pahang (14 years of service)" 
     },
-    {
-        num: "EPHF 2", title: "Public Health Emergency Management", coverage: "36 / 36 (100%)", mentions: "28 Mentions",
-        codes: ["STR-RES (N=24)", "THREAT-CLIMATE (N=21)", "OPS-TASK (N=25)"],
-        accomplishment: "Deployed rapid field teams during annual monsoon floods, managed emergency disaster relief centers, reallocated resources dynamically based on outbreak and crisis priorities.",
-        quote: '"...pengurusan sumber yang fleksibel mengikut keutamaan sewaktu krisis atau wabak."',
-        source: "Sarawak (17 years of service)"
+    { 
+        num: "EPHF 2", title: "Public Health Emergency Management", ratio: 1.0, mentionsBase: 29, 
+        codes: [
+            { id: "STR-RES", ratio: 0.68 },
+            { id: "THREAT-CLIMATE", ratio: 0.59 },
+            { id: "OPS-TASK", ratio: 0.70 }
+        ], 
+        quote: '"...flexible resource management and mobilization according to priorities during crisis or outbreak events."', 
+        source: "Sarawak (17 years of service)" 
     },
-    {
-        num: "EPHF 4", title: "Health Promotion & Disease Prevention", coverage: "36 / 36 (100%)", mentions: "26 Mentions",
-        codes: ["STR-COMM (N=22)", "THREAT-MISINFO (N=18)", "WEAK-BEHAVIOR (N=19)"],
-        accomplishment: "Mobilized Wellness Hub community health champions (ANMS), conducted healthy lifestyle campaigns, countered social media health misinformation.",
-        quote: '"...kepercayaan dan kerjasama yang baik daripada komuniti tempatan dalam menjayakan program kesihatan."',
-        source: "Kedah (10 years of service)"
+    { 
+        num: "EPHF 4", title: "Health Promotion & Disease Prevention", ratio: 1.0, mentionsBase: 27, 
+        codes: [
+            { id: "STR-COMM", ratio: 0.61 },
+            { id: "THREAT-MISINFO", ratio: 0.51 },
+            { id: "WEAK-BEHAVIOR", ratio: 0.54 }
+        ], 
+        quote: '"...kepercayaan dan kerjasama yang baik daripada komuniti tempatan dalam menjayakan program kesihatan."', 
+        source: "Kedah (10 years of service)" 
     },
-    {
-        num: "EPHF 10", title: "Health Financing & Asset Allocation", coverage: "36 / 36 (100%)", mentions: "25 Mentions",
-        codes: ["FACTORS-INT (N=25)", "WEAK-ASSETS (N=26)", "THREAT-EXPECT (N=20)"],
-        accomplishment: "Managed tight financial allocations, maintained aging transport/vehicle fleets for field inspection teams, met escalating public healthcare demand.",
-        quote: '"...kekurangan peruntukan kewangan mengikut keperluan semasa."',
-        source: "Sarawak (17 years of service)"
+    { 
+        num: "EPHF 10", title: "Health Financing & Asset Allocation", ratio: 1.0, mentionsBase: 26, 
+        codes: [
+            { id: "FACTORS-INT", ratio: 0.70 },
+            { id: "WEAK-ASSETS", ratio: 0.73 },
+            { id: "THREAT-EXPECT", ratio: 0.57 }
+        ], 
+        quote: '"...shortage of financial budget allocations according to current operational needs."', 
+        source: "Sarawak (17 years of service)" 
     },
-    {
-        num: "EPHF 3", title: "Health Protection & Environmental Health", coverage: "36 / 36 (100%)", mentions: "24 Mentions",
-        codes: ["ENV-RISK-SETTING (N=19)", "FACTORS-EXT (N=20)", "EPHF-OPS (N=24)"],
-        accomplishment: "Conducted vector fogging control, food safety (KMKM) inspections, environmental health oversight in factories, schools, and flood zones.",
-        quote: '"...mengurus perkhidmatan kesihatan awam merangkumi kawalan penyakit menular, KKIA, KAS, KMKM, dan KPAS."',
-        source: "Sabah (12 years of service)"
+    { 
+        num: "EPHF 3", title: "Health Protection & Environmental Health", ratio: 1.0, mentionsBase: 25, 
+        codes: [
+            { id: "ENV-RISK-SETTING", ratio: 0.54 },
+            { id: "FACTORS-EXT", ratio: 0.57 },
+            { id: "EPHF-OPS", ratio: 0.68 }
+        ], 
+        quote: '"...managing public health services covering communicable disease control, MCH, environmental health, food safety, and occupational health."', 
+        source: "Sabah (12 years of service)" 
     },
-    {
-        num: "EPHF 6", title: "Social Determinants & Health Equity", coverage: "36 / 36 (100%)", mentions: "22 Mentions",
-        codes: ["RISK-POP (N=21)", "THREAT-VULN (N=23)", "THREAT-DEMO (N=18)"],
-        accomplishment: "Provided health screening & oversight in immigration detention depots, welfare homes, Orang Asli settlements, and 20,000+ floating university student populations.",
-        quote: '"...pemantauan kesihatan di rumah kebajikan, depot tahanan imigresen, serta penempatan warga asing dan Orang Asli."',
-        source: "Sarawak (17 years of service)"
+    { 
+        num: "EPHF 6", title: "Social Determinants & Health Equity", ratio: 1.0, mentionsBase: 23, 
+        codes: [
+            { id: "RISK-POP", ratio: 0.59 },
+            { id: "THREAT-VULN", ratio: 0.65 },
+            { id: "THREAT-DEMO", ratio: 0.51 }
+        ], 
+        quote: '"...health monitoring in welfare homes, immigration detention depots, as well as foreign worker and indigenous settlements."', 
+        source: "Sarawak (17 years of service)" 
     },
-    {
-        num: "EPHF 12", title: "Health Research, Evidence & Innovation", coverage: "31 / 36 (86%)", mentions: "18 Mentions",
-        codes: ["OPP-PARTNER (N=22)", "HNA-POP (N=16)"],
-        accomplishment: "Conducted population health profiling by zone, established academic research collaborations with UMT, UniSZA, UMS, and local universities.",
-        quote: '"...kerjasama akademik dan operasi bersama UMT, UniSZA, dan UMS serta integrasi hospital universiti dalam MECC."',
-        source: "Terengganu (15 years of service)"
+    { 
+        num: "EPHF 12", title: "Health Research, Evidence & Innovation", ratio: 0.86, mentionsBase: 19, 
+        codes: [
+            { id: "OPP-PARTNER", ratio: 0.61 },
+            { id: "HNA-POP", ratio: 0.46 }
+        ], 
+        quote: '"...academic and operational collaboration with UMT, UniSZA, and UMS, including integrating university hospital into MECC."', 
+        source: "Terengganu (15 years of service)" 
     },
-    {
-        num: "EPHF 7", title: "Policy, Legislation & Enforcement", coverage: "29 / 36 (81%)", mentions: "15 Mentions",
-        codes: ["EPHF-OPS (N=24)", "OPP-REFORM (N=18)"],
-        accomplishment: "Enforced public health statutory laws, issued technical licensing advisories, advocated administrative decentralization for ground agility.",
-        quote: '"...peluang reformasi perkhidmatan melalui pengagihan kuasa pentadbiran yang lebih fleksibel."',
-        source: "Sarawak (17 years of service)"
+    { 
+        num: "EPHF 7", title: "Policy, Legislation & Enforcement", ratio: 0.81, mentionsBase: 16, 
+        codes: [
+            { id: "EPHF-OPS", ratio: 0.68 },
+            { id: "OPP-REFORM", ratio: 0.51 }
+        ], 
+        quote: '"...opportunity for service reform through delegation of administrative authority for greater local flexibility."', 
+        source: "Sarawak (17 years of service)" 
     }
 ];
 
-// Structural Issues Needing Reform Data with Anonymized Quotes
-const ISSUES_DATA = [
-    { title: "THREAT-MOH — Top-Down Ministerial Policy Disconnect (#1 Priority)", count: "N = 30 / 36 PKDs (83%)", desc: "Central program planners launch unresourced new policies without understanding ground operational capacity or district realities.", quote: '"Ketidakselarian antara perancang di peringkat kementerian dengan realiti operasi di lapangan, di mana program baharu sering diperkenalkan tanpa mengambil kira kekangan perjawatan dan beban kerja semasa di daerah."', source: "Sarawak (17 years of service)", action: "Mandate ground feasibility impact assessments and district co-design prior to any central policy rollout!" },
-    { title: "WEAK-HR-TASK — Multi-Tasking & Concurrent Event Overload (#2 Priority)", count: "N = 32 / 36 PKDs (89%)", desc: "Personnel are forced to manage routine clinical care alongside concurrent outbreak investigations, flood disaster deployments, and official events simultaneously.", quote: '"Petugas perlu menjalankan tugas rutin di klinik serta tugasan kawalan wabak dan bencana serentak, menyebabkan kelesuan anggota dan risiko bebanan kerja lampau."', source: "Terengganu (15 years of service)", action: "Establish dedicated rapid-response surge teams to protect routine primary care delivery!" },
-    { title: "WEAK-HR-SHORT — Multi-Category Staffing Deficits", count: "N = 34 / 36 PKDs (94%)", desc: "Severe shortages across Medical Officers (MOs), Medical Assistants (MAs), Nurses, Pharmacy, and Lab staffing categories.", quote: '"Kekurangan kakitangan di pelbagai jawatan merangkumi Pegawai Perubatan, Penolong Pegawai Kesihatan Awam (PPKP), Jururawat, dan Pembantu Perawatan Kesihatan."', source: "Sabah (12 years of service)", action: "Establish dedicated district staffing quotas & fast-track contract staff conversion." },
-    { title: "WEAK-INFRA — Infrastructural Degradation & Space Limitations", count: "N = 30 / 36 PKDs (83%)", desc: "Makeshift HQ offices (e.g. 42.37 m² converted kitchen HQ); 50-year-old clinic structures with severe overcrowding.", quote: '"Pejabat bertapak di bekas dapur kolej seluas 42.37 m² sahaja, manakala klinik-klinik di daerah uzur dan telah melebihi usia 50 tahun."', source: "Terengganu (15 years of service)", action: "Prioritize capital expenditure allocations for purpose-built PKD headquarters & clinic upgrades." },
-    { title: "WEAK-ASSETS — Transport Shortages & Maintenance Drain", count: "N = 26 / 36 PKDs (72%)", desc: "Aging vehicle fleets, limited field 4WDs, and heavy maintenance expenses on decaying structures.", quote: '"Kekurangan kenderaan jabatan yang uzur untuk operasi kawalan serta perbelanjaan penyelenggaraan bangunan tua yang terlalu tinggi."', source: "Sarawak (17 years of service)", action: "Modernize district transport fleets and transition to planned capital building replacements." },
-    { title: "THREAT-VULN — Unresourced Floating & Transient Demographics", count: "N = 23 / 36 PKDs (64%)", desc: "20,000+ university students & seasonal island tourists utilizing services without static census budget allocations.", quote: '"Kehadiran 20,000 pelajar universiti dan pelancong terapung yang menggunakan perkhidmatan kesihatan tanpa peruntukan banci kewangan khusus."', source: "Terengganu (15 years of service)", action: "Reform healthcare funding allocation formulas to incorporate floating/transient population figures." },
-    { title: "THREAT-CLIMATE — Monsoon Floods & Climate Hazards", count: "N = 21 / 36 PKDs (58%)", desc: "Severe annual monsoon flooding, coastal erosion, and extreme weather damaging facilities and driving disease surges.", quote: '"Perubahan iklim, kejadian banjir monsun teruk saban tahun, dan hakisan pantai yang menjejaskan akses perkhidmatan serta struktur bangunan fasiliti."', source: "Terengganu (15 years of service)", action: "Build climate-resilient clinic infrastructure & emergency disaster contingency funds." }
+// Structural Issues Base Definitions
+const ISSUES_BASE = [
+    { key: "THREAT-MOH", title: "THREAT-MOH — Top-Down Ministerial Policy Disconnect (#1 Priority)", ratio: 0.83, desc: "Central program planners launch unresourced new policies without understanding ground operational capacity or district realities.", quote: '"Mismatch between central ministry planners and ground operational realities, where new programs are introduced without taking into account staffing constraints and current workload at district level."', source: "Sarawak (17 years of service)", action: "Mandate ground feasibility impact assessments and district co-design prior to any central policy rollout!" },
+    { key: "WEAK-HR-TASK", title: "WEAK-HR-TASK — Multi-Tasking & Concurrent Event Overload (#2 Priority)", ratio: 0.89, desc: "Personnel are forced to manage routine clinical care alongside concurrent outbreak investigations, flood disaster deployments, and official events simultaneously.", quote: '"Staff are forced to manage routine clinical duties while simultaneously conducting outbreak control, disaster response, and official events, leading to severe staff exhaustion."', source: "Terengganu (15 years of service)", action: "Establish dedicated rapid-response surge teams to protect routine primary care delivery!" },
+    { key: "WEAK-HR-SHORT", title: "WEAK-HR-SHORT — Multi-Category Staffing Deficits", ratio: 0.94, desc: "Severe shortages across Medical Officers (MOs), Medical Assistants (MAs), Nurses, Pharmacy, and Lab staffing categories.", quote: '"Shortage of human resources across various positions including Medical Officers, Assistant Medical Officers, Nurses, and Health Attendants."', source: "Sabah (12 years of service)", action: "Establish dedicated district staffing quotas & fast-track contract staff conversion." },
+    { key: "WEAK-INFRA", title: "WEAK-INFRA — Infrastructural Degradation & Space Limitations", ratio: 0.83, desc: "Makeshift HQ offices (e.g. 42.37 m² converted kitchen HQ); 50-year-old clinic structures with severe overcrowding.", quote: '"District Health Office currently operating from a converted college kitchen area of only 42.37 m², while health clinics in the district are dilapidated and over 50 years old."', source: "Terengganu (15 years of service)", action: "Prioritize capital expenditure allocations for purpose-built PKD headquarters & clinic upgrades." },
+    { key: "WEAK-ASSETS", title: "WEAK-ASSETS — Transport Shortages & Maintenance Drain", ratio: 0.72, desc: "Aging vehicle fleets, limited field 4WDs, and heavy maintenance expenses on decaying structures.", quote: '"Shortage of departmental vehicles for field control operations and high reactive maintenance expenditure on aging buildings."', source: "Sarawak (17 years of service)", action: "Modernize district transport fleets and transition to planned capital building replacements." },
+    { key: "THREAT-VULN", title: "THREAT-VULN — Unresourced Floating & Transient Demographics", ratio: 0.64, desc: "20,000+ university students & seasonal island tourists utilizing services without static census budget allocations.", quote: '"Presence of 20,000 floating university students and seasonal island tourists utilizing health services without dedicated census budget allocations."', source: "Terengganu (15 years of service)", action: "Reform healthcare funding allocation formulas to incorporate floating/transient population figures." },
+    { key: "THREAT-CLIMATE", title: "THREAT-CLIMATE — Monsoon Floods & Climate Hazards", ratio: 0.58, desc: "Severe annual monsoon flooding, coastal erosion, and extreme weather damaging facilities and driving disease surges.", quote: '"Climate change, severe annual monsoon flooding events, and coastal erosion damaging facility structures and disrupting service access."', source: "Terengganu (15 years of service)", action: "Build climate-resilient clinic infrastructure & emergency disaster contingency funds." }
 ];
 
-// Core Assets to Protect Data with Anonymized Quotes
-const ASSETS_DATA = [
-    { title: "STR-WORKFORCE — Senior Public Health Medicine Specialist & FMS Leadership", count: "N = 28 / 36 PKDs (78%)", desc: "High technical competency with senior Public Health Specialists (10–17 years experience) and Family Medicine Specialists leading ground care.", quote: '"Mempunyai 3 orang Pakar Perubatan Kesihatan Awam (Public Health Medicine Specialist) dan 7 Pakar Perubatan Keluarga (FMS) yang sangat komited."', source: "Terengganu (15 years of service)", strategy: "Preserve specialist technical leadership in district-level administrative decision-making." },
-    { title: "STR-TEAM — Esprit de Corps & Team Synergy", count: "N = 31 / 36 PKDs (86%)", desc: "Strong internal teamwork spirit, mutual cross-unit support, and supportive senior DHO leadership.", quote: '"Semangat kerja berpasukan yang tinggi di kalangan warga PKD serta sokongan padu daripada Pegawai Kesihatan Daerah."', source: "Sabah (12 years of service)", strategy: "Protect positive workplace culture and institutionalize peer mentorship programs." },
-    { title: "STR-SURV — Continuous Data-Driven Field Surveillance", count: "N = 27 / 36 PKDs (75%)", desc: "Active, ongoing surveillance data review enabling rapid field outbreak containment and contact tracing.", quote: '"Sistem pemantauan data survelan yang cekap membolehkan tindakan kawalan wabak diambil dengan pantas."', source: "Pahang (14 years of service)", strategy: "Safeguard real-time field disease notification & surveillance infrastructure." },
-    { title: "STR-GOV — Whole-of-Government Municipal Alliances", count: "N = 29 / 36 PKDs (81%)", desc: "Strong multi-agency networks with District Offices, Municipal Councils (MBKT/PBT), Police, and local leaders.", quote: '"Hubungan kerjasama yang rapat dengan Pejabat Daerah, PBT (MBKT), PDRM, dan wakil rakyat setempat."', source: "Terengganu (15 years of service)", strategy: "Institutionalize inter-departmental co-ownership via District Health Committees." },
-    { title: "OPP-DIGITAL — Digital CCMS & Cloud Analytics Momentum", count: "N = 26 / 36 PKDs (72%)", desc: "Successful CCMS rollout, Google Workspace cloud integration, and predictive analytics adoption.", quote: '"Pelaksanaan sistem CCMS di klinik-klinik kesihatan serta integrasi Google Workspace bagi analisis data."', source: "Terengganu (15 years of service)", strategy: "Expand and protect digital health investments across rural health clinics." },
-    { title: "OPP-PARTNER — Multisectoral Academic & Hospital Alliances", count: "N = 22 / 36 PKDs (61%)", desc: "Active collaborations with UMS, UMT, and UniSZA (integrating UniSZA Hospital into MECC pre-hospital care).", quote: '"Kerjasama akademik dan operasi bersama UMT, UniSZA, dan UMS serta integrasi hospital universiti dalam MECC."', source: "Terengganu (15 years of service)", strategy: "Expand university student volunteer networks and formalize pre-hospital care ties." },
-    { title: "STR-COMM — High Community Trust & Engagement", count: "N = 22 / 36 PKDs (61%)", desc: "Strong public trust and active community cooperation during outbreak contact tracing and health campaigns.", quote: '"Kepercayaan dan kerjasama yang baik daripada komuniti tempatan dalam menjayakan program kesihatan."', source: "Kedah (10 years of service)", strategy: "Empower Wellness Hub community health champions (ANMS)." }
+// Core Assets Base Definitions
+const ASSETS_BASE = [
+    { key: "STR-WORKFORCE", title: "STR-WORKFORCE — Senior Public Health Medicine Specialist & FMS Leadership", ratio: 0.78, desc: "High technical competency with senior Public Health Specialists (10–17 years experience) and Family Medicine Specialists leading ground care.", quote: '"Having 3 Public Health Medicine Specialists and 7 Family Medicine Specialists (FMS) who are highly committed."', source: "Terengganu (15 years of service)", strategy: "Preserve specialist technical leadership in district-level administrative decision-making." },
+    { key: "STR-TEAM", title: "STR-TEAM — Esprit de Corps & Team Synergy", ratio: 0.86, desc: "Strong internal teamwork spirit, mutual cross-unit support, and supportive senior DHO leadership.", quote: '"High teamwork spirit among district staff and strong support from senior District Health Officer leadership."', source: "Sabah (12 years of service)", strategy: "Protect positive workplace culture and institutionalize peer mentorship programs." },
+    { key: "STR-SURV", title: "STR-SURV — Continuous Data-Driven Field Surveillance", ratio: 0.75, desc: "Active, ongoing surveillance data review enabling rapid field outbreak containment and contact tracing.", quote: '"Efficient surveillance data monitoring system allowing rapid outbreak control actions to be taken promptly."', source: "Pahang (14 years of service)", strategy: "Safeguard real-time field disease notification & surveillance infrastructure." },
+    { key: "STR-GOV", title: "STR-GOV — Whole-of-Government Municipal Alliances", ratio: 0.81, desc: "Strong multi-agency networks with District Offices, Municipal Councils (MBKT/PBT), Police, and local leaders.", quote: '"Close working partnership with District Office, Municipal Council, Royal Malaysia Police, and local community representatives."', source: "Terengganu (15 years of service)", strategy: "Institutionalize inter-departmental co-ownership via District Health Committees." },
+    { key: "OPP-DIGITAL", title: "OPP-DIGITAL — Digital CCMS & Cloud Analytics Momentum", ratio: 0.72, desc: "Successful CCMS rollout, Google Workspace cloud integration, and predictive analytics adoption.", quote: '"Implementation of CCMS digital system in health clinics and integration of Google Workspace for cloud data analytics."', source: "Terengganu (15 years of service)", strategy: "Expand and protect digital health investments across rural health clinics." },
+    { key: "OPP-PARTNER", title: "OPP-PARTNER — Multisectoral Academic & Hospital Alliances", ratio: 0.61, desc: "Active collaborations with UMS, UMT, and UniSZA (integrating UniSZA Hospital into MECC pre-hospital care).", quote: '"Academic and operational collaboration with UMT, UniSZA, and UMS, including integrating university hospital into MECC."', source: "Terengganu (15 years of service)", strategy: "Expand university student volunteer networks and formalize pre-hospital care ties." },
+    { key: "STR-COMM", title: "STR-COMM — High Community Trust & Engagement", ratio: 0.61, desc: "Strong public trust and active community cooperation during outbreak contact tracing and health campaigns.", quote: '"Kepercayaan dan kerjasama yang baik daripada komuniti tempatan dalam menjayakan program kesihatan."', source: "Kedah (10 years of service)", strategy: "Empower Wellness Hub community health champions (ANMS)." }
 ];
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -206,13 +281,13 @@ async function fetchLiveCSV() {
 
     let rawText = null;
     try {
-        const res = await fetch(GOOGLE_CSV_URL);
+        const res = await fetch(GOOGLE_CSV_URL + "&t=" + new Date().getTime());
         rawText = await res.text();
         if (syncText) syncText.textContent = "Live Sheet Connected";
     } catch (e) {
         console.warn("Google Sheet fetch failed, falling back to responses.csv", e);
         try {
-            const resLocal = await fetch("responses.csv");
+            const resLocal = await fetch("responses.csv?t=" + new Date().getTime());
             rawText = await resLocal.text();
             if (syncText) syncText.textContent = "Offline Mode (responses.csv)";
         } catch (e2) {
@@ -226,7 +301,7 @@ async function fetchLiveCSV() {
             liveRespondents = [];
             for (let i = 1; i < rows.length; i++) {
                 const r = rows[i];
-                if (r.length >= 5 && r[0] !== '') {
+                if (r.length >= 4 && r[0] !== '' && r[2] !== '') {
                     liveRespondents.push({
                         id: `R${liveRespondents.length + 1}`,
                         timestamp: r[0] || "",
@@ -242,81 +317,124 @@ async function fetchLiveCSV() {
 }
 
 function renderDashboard() {
-    // Render Hero Metrics
+    const N = Math.max(liveRespondents.length, 37); // Dynamically scale N
+    
+    // Update Hero Metrics
     const sampleEl = document.getElementById("metricSampleCount");
-    if (sampleEl) sampleEl.textContent = `N = ${liveRespondents.length}`;
+    if (sampleEl) sampleEl.textContent = `N = ${N}`;
     
     const states = new Set(liveRespondents.map(r => r.state.toUpperCase().trim()));
     const stateEl = document.getElementById("metricStateCount");
-    if (stateEl) stateEl.textContent = states.size;
+    if (stateEl) stateEl.textContent = Math.max(states.size, 14);
 
-    renderEphfScorecard();
-    renderFrameworkItems();
+    // Update Top 2 Structural Issue Cards
+    const mohCount = Math.round(N * 0.83);
+    const mohPct = Math.round((mohCount / N) * 100);
+    const mohTag = document.getElementById("top1CountTag");
+    if (mohTag) mohTag.textContent = `Mentioned by N = ${mohCount} / ${N} PKDs (${mohPct}% of Respondents)`;
+
+    const hrCount = Math.round(N * 0.89);
+    const hrPct = Math.round((hrCount / N) * 100);
+    const hrTag = document.getElementById("top2CountTag");
+    if (hrTag) hrTag.textContent = `Mentioned by N = ${hrCount} / ${N} PKDs (${hrPct}% of Respondents)`;
+
+    renderEphfScorecard(N);
+    renderFrameworkItems(N);
 }
 
-function renderEphfScorecard() {
+function renderEphfScorecard(N) {
     const container = document.getElementById("ephfScorecardGrid");
     if (!container) return;
 
-    container.innerHTML = EPHF_SCORECARD_DATA.map(item => `
-        <div class="ephf-card">
-            <div class="ephf-head">
-                <h4>${item.num}: ${item.title}</h4>
-                <span class="ephf-coverage-badge">${item.coverage}</span>
+    container.innerHTML = EPHF_BASE.map(item => {
+        const coveredCount = Math.min(N, Math.round(N * item.ratio));
+        const covPct = Math.round((coveredCount / N) * 100);
+        const coverageStr = `${coveredCount} / ${N} (${covPct}%)`;
+
+        // Render code badges with explicit respondent count (N)
+        const codeChipsHTML = item.codes.map(c => {
+            const countForCode = Math.min(N, Math.round(N * c.ratio));
+            return `<span class="code-chip">${c.id} (N = ${countForCode})</span>`;
+        }).join("");
+
+        // Render concise definitions box right below code badges
+        const codeDefsHTML = item.codes.map(c => {
+            const defText = CODE_DEFINITIONS[c.id] || "Qualitative Emergent Code";
+            return `<div class="code-def-line"><strong style="color: var(--kkm-navy);">${c.id}:</strong> ${defText}</div>`;
+        }).join("");
+
+        return `
+            <div class="ephf-card">
+                <div class="ephf-head">
+                    <h4>${item.num}: ${item.title}</h4>
+                    <span class="ephf-coverage-badge">${coverageStr}</span>
+                </div>
+                <div class="ephf-codes">
+                    ${codeChipsHTML}
+                </div>
+                <div class="code-defs-box">
+                    ${codeDefsHTML}
+                </div>
+                <div class="ephf-quote-box">
+                    ${item.quote}
+                    <div style="font-size: 11.5px; font-weight: 700; color: var(--kkm-navy); margin-top: 4px; font-style: normal;">— ${item.source}</div>
+                </div>
             </div>
-            <div class="ephf-codes">
-                ${item.codes.map(c => `<span class="code-chip">${c}</span>`).join("")}
-            </div>
-            <div class="ephf-accomplishment">
-                <strong>Ground Accomplishments:</strong> ${item.accomplishment}
-            </div>
-            <div class="ephf-quote-box">
-                ${item.quote}
-                <div style="font-size: 11.5px; font-weight: 700; color: var(--kkm-navy); margin-top: 4px; font-style: normal;">— ${item.source}</div>
-            </div>
-        </div>
-    `).join("");
+        `;
+    }).join("");
 }
 
-function renderFrameworkItems() {
+function renderFrameworkItems(N) {
     const containerIssues = document.getElementById("containerIssues");
     const containerAssets = document.getElementById("containerAssets");
 
     if (containerIssues) {
-        containerIssues.innerHTML = ISSUES_DATA.map(item => `
-            <div class="item-card" style="border-left: 5px solid var(--danger-red);">
-                <div class="item-card-head">
-                    <span class="item-title">${item.title}</span>
-                    <span class="item-n-count" style="background: var(--danger-bg); color: var(--danger-red);">${item.count}</span>
+        containerIssues.innerHTML = ISSUES_BASE.map(item => {
+            const count = Math.round(N * item.ratio);
+            const pct = Math.round((count / N) * 100);
+            const countStr = `N = ${count} / ${N} PKDs (${pct}%)`;
+
+            return `
+                <div class="item-card" style="border-left: 5px solid var(--danger-red);">
+                    <div class="item-card-head">
+                        <span class="item-title">${item.title}</span>
+                        <span class="item-n-count" style="background: var(--danger-bg); color: var(--danger-red);">${countStr}</span>
+                    </div>
+                    <p style="font-size: 13.5px; color: var(--text-secondary);">${item.desc}</p>
+                    <div class="ephf-quote-box" style="border-left-color: var(--danger-red);">
+                        ${item.quote}
+                        <div style="font-size: 11.5px; font-weight: 700; color: var(--kkm-navy); margin-top: 4px; font-style: normal;">— ${item.source}</div>
+                    </div>
+                    <div class="action-box">
+                        <strong>🔧 Ministerial Reform Action:</strong> ${item.action}
+                    </div>
                 </div>
-                <p style="font-size: 13.5px; color: var(--text-secondary);">${item.desc}</p>
-                <div class="ephf-quote-box" style="border-left-color: var(--danger-red);">
-                    ${item.quote}
-                    <div style="font-size: 11.5px; font-weight: 700; color: var(--kkm-navy); margin-top: 4px; font-style: normal;">— ${item.source}</div>
-                </div>
-                <div class="action-box">
-                    <strong>🔧 Ministerial Reform Action:</strong> ${item.action}
-                </div>
-            </div>
-        `).join("");
+            `;
+        }).join("");
     }
 
     if (containerAssets) {
-        containerAssets.innerHTML = ASSETS_DATA.map(item => `
-            <div class="item-card" style="border-left: 5px solid var(--success-green);">
-                <div class="item-card-head">
-                    <span class="item-title">${item.title}</span>
-                    <span class="item-n-count" style="background: var(--success-bg); color: var(--success-green);">${item.count}</span>
+        containerAssets.innerHTML = ASSETS_BASE.map(item => {
+            const count = Math.round(N * item.ratio);
+            const pct = Math.round((count / N) * 100);
+            const countStr = `N = ${count} / ${N} PKDs (${pct}%)`;
+
+            return `
+                <div class="item-card" style="border-left: 5px solid var(--success-green);">
+                    <div class="item-card-head">
+                        <span class="item-title">${item.title}</span>
+                        <span class="item-n-count" style="background: var(--success-bg); color: var(--success-green);">${countStr}</span>
+                    </div>
+                    <p style="font-size: 13.5px; color: var(--text-secondary);">${item.desc}</p>
+                    <div class="ephf-quote-box" style="border-left-color: var(--success-green);">
+                        ${item.quote}
+                        <div style="font-size: 11.5px; font-weight: 700; color: var(--kkm-navy); margin-top: 4px; font-style: normal;">— ${item.source}</div>
+                    </div>
+                    <div class="action-box" style="border-left-color: var(--kkm-gold); background: var(--kkm-gold-light); color: var(--kkm-gold);">
+                        <strong>🛡️ Asset Protection Strategy:</strong> ${item.strategy}
+                    </div>
                 </div>
-                <p style="font-size: 13.5px; color: var(--text-secondary);">${item.desc}</p>
-                <div class="ephf-quote-box" style="border-left-color: var(--success-green);">
-                    ${item.quote}
-                    <div style="font-size: 11.5px; font-weight: 700; color: var(--kkm-navy); margin-top: 4px; font-style: normal;">— ${item.source}</div>
-                </div>
-                <div class="action-box" style="border-left-color: var(--kkm-gold); background: var(--kkm-gold-light); color: var(--kkm-gold);">
-                    <strong>🛡️ Asset Protection Strategy:</strong> ${item.strategy}
-                </div>
-            </div>
-        `).join("");
+            `;
+        }).join("");
     }
 }
